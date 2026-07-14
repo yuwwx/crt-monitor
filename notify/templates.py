@@ -1,6 +1,6 @@
 def warning(crl_name, serial, revocation_date, reason=None, cn=None):
 
-    certificate = f"CN: {cn}" if cn else f"Serial: {serial}"
+    cn_text = f"CN: {cn}\n" if cn else ""
 
     return f"""
 
@@ -10,13 +10,13 @@ CRL:
 {crl_name}
 
 Сертификат:
-{certificate}
+{cn_text}Serial: {serial}
 
 Дата отзыва:
 {revocation_date}
 
 Причина:
-{reason or "Unknown"}
+{reason or "Не указана"}
 """.strip()
 
 
@@ -28,17 +28,17 @@ def corporate_alert(crl_name, serial, domain, revocation_date, reason=None):
 CRL:
 {crl_name}
 
-Домен:
-{domain}
-
 Сертификат:
+CN:
+{domain}
+Serial:
 {serial}
 
 Дата отзыва:
 {revocation_date}
 
 Причина:
-{reason or "Unknown"}
+{reason or "Не указана"}
 """.strip()
 
 

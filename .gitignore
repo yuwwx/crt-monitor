@@ -3,3 +3,5 @@ __pycache__
 config.yaml
 company_certs.yaml
 misc/company-certs-list.*
+logs
+state.json
