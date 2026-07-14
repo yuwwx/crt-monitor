@@ -1,0 +1,29 @@
+monitor:
+  check_interval: 300
+  tick_interval: 60
+  start_date: "2026-07-10T13:06:30Z"
+
+crl:
+  timeout: 20
+  unavailable_interval: 300
+
+sources:
+  - name: "GlobalSign GCC R6 AlphaSSL CA 2025"
+    url: "http://crl.globalsign.com/gsgccr6alphasslca2025.crl"
+  - name: "HARICA DV TLS RSA"
+    url: "http://crl.harica.gr/HARICA-DV-TLS-Sub-R1.crl"
+  - name: "HARICA DV TLS ECC"
+    url: "http://crl.harica.gr/HARICA-DV-TLS-Sub-E1.crl"
+
+resolver:
+  url: "https://ct.certkit.io/certificate/serial"
+  timeout: 10
+  request_interval: 20
+
+telegram:
+  token: ""
+  chat_id: ""
+  company_chat_id: ""
+
+logging:
+  level: INFO
