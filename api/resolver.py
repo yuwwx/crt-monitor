@@ -3,14 +3,28 @@ import logging
 
 import requests
 
+from dataclasses import dataclass
+
 from models import ResolverConfig
+
 
 logger = logging.getLogger(__name__)
 
 
+@dataclass
+class CertificateInfo:
+
+    common_name: str | None
+
+    dns_names: list[str]
+
+
 class CertificateResolver:
 
-    def __init__(self, config: ResolverConfig):
+    def __init__(
+            self,
+            config: ResolverConfig
+    ):
 
         self.config = config
 
@@ -18,27 +32,50 @@ class CertificateResolver:
 
         self.session.headers.update(
             {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"
+                "User-Agent": (
+                    "Mozilla/5.0 "
+                    "(Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 "
+                    "(KHTML, like Gecko) "
+                    "Chrome/150.0.0.0 "
+                    "Safari/537.36"
+                ),
+
+                "Accept": "application/json"
             }
         )
 
         self.last_request = 0
 
-    def resolve(self, serial: str) -> str | None:
+    def resolve(
+            self,
+            serial: str
+    ) -> CertificateInfo | None:
 
         self.wait_rate_limit()
 
         try:
 
-            url = f"{self.config.url}/{serial}"
+            url = (
+                f"{self.config.url}/{serial}"
+            )
 
-            logger.info("Resolving certificate CN: %s", serial)
+            logger.info(
+                "Resolving certificate info: %s",
+                serial
+            )
 
-            response = self.session.get(url, timeout=self.config.timeout)
+            response = self.session.get(
+                url,
+                timeout=self.config.timeout
+            )
 
             if response.status_code == 404:
 
-                logger.warning("Certificate not found in resolver: %s", serial)
+                logger.warning(
+                    "Certificate not found in resolver: %s",
+                    serial
+                )
 
                 return None
 
@@ -46,35 +83,70 @@ class CertificateResolver:
 
             data = response.json()
 
-            certificate = data.get("certificate")
+            certificate = data.get(
+                "certificate"
+            )
 
             if not certificate:
 
-                logger.warning("Empty certificate response for %s", serial)
+                logger.warning(
+                    "Empty certificate response for %s",
+                    serial
+                )
 
                 return None
 
-            common_name = certificate.get("commonName")
+            common_name = certificate.get(
+                "commonName"
+            )
+
+            dns_names = certificate.get(
+                "dnsNames",
+                []
+            )
 
             if common_name:
 
-                logger.info("Resolved CN %s -> %s", serial, common_name)
+                logger.info(
+                    "Resolved CN %s -> %s",
+                    serial,
+                    common_name
+                )
 
             else:
 
-                logger.warning("CN not found for %s", serial)
+                logger.warning(
+                    "CN not found for %s",
+                    serial
+                )
 
-            return common_name
+            logger.info(
+                "Resolved DNS names %s -> %s",
+                serial,
+                dns_names
+            )
+
+            return CertificateInfo(
+                common_name=common_name,
+                dns_names=dns_names
+            )
 
         except requests.RequestException as e:
 
-            logger.warning("Resolver request failed %s: %s", serial, e)
+            logger.warning(
+                "Resolver request failed %s: %s",
+                serial,
+                e
+            )
 
             return None
 
-        except Exception as e:
+        except Exception:
 
-            logger.exception("Resolver error for %s", serial)
+            logger.exception(
+                "Resolver error for %s",
+                serial
+            )
 
             return None
 
@@ -82,10 +154,15 @@ class CertificateResolver:
 
         now = time.time()
 
-        diff = now - self.last_request
+        diff = (
+            now -
+            self.last_request
+        )
 
         if diff < self.config.request_interval:
 
-            time.sleep(self.config.request_interval - diff)
+            time.sleep(
+                self.config.request_interval - diff
+            )
 
         self.last_request = time.time()

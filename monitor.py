@@ -15,13 +15,15 @@ logger = logging.getLogger(__name__)
 
 class CRLMonitor:
 
-    def __init__(self, config, state, company_certs, resolver, notifier):
+    def __init__(self, config, state, company_certs, company_filters, resolver, notifier):
 
         self.config = config
 
         self.state = state
 
         self.company_certs = company_certs
+
+        self.company_filters = company_filters
 
         self.resolver = resolver
 
@@ -51,7 +53,8 @@ class CRLMonitor:
 
             data = self.client.download(source)
 
-            logger.info("CRL downloaded: %s, size=%s bytes", source.name, len(data))
+            logger.info("CRL downloaded: %s, size=%s bytes",
+                        source.name, len(data))
 
         except CRLDownloadError as e:
 
@@ -69,7 +72,8 @@ class CRLMonitor:
 
         state.failed_attempts += 1
 
-        logger.warning("%s unavailable. Attempt %s", source.name, state.failed_attempts)
+        logger.warning("%s unavailable. Attempt %s",
+                       source.name, state.failed_attempts)
 
         if state.status != "unavailable":
 
@@ -113,7 +117,8 @@ class CRLMonitor:
 
         state.last_success = now
 
-        state.next_check = now + timedelta(seconds=self.config.monitor.check_interval)
+        state.next_check = now + \
+            timedelta(seconds=self.config.monitor.check_interval)
 
         self.process_crl(source, state, data)
 
@@ -131,7 +136,8 @@ class CRLMonitor:
 
         new_certificates = 0
 
-        logger.info("CRL %s contains %s revoked certificates", source.name, total)
+        logger.info("CRL %s contains %s revoked certificates",
+                    source.name, total)
 
         for cert in revoked_certificates:
 
@@ -175,13 +181,19 @@ class CRLMonitor:
 
         serial = cert.serial
 
+        # 1. Проверяем точное совпадение по serial
+
         company_cert = self.company_certs.get(serial)
 
         if company_cert:
 
-            logger.error("Corporate certificate revoked: %s", serial)
+            logger.error(
+                "Corporate certificate detected by serial: %s",
+                serial
+            )
 
             self.notifier.send(
+
                 corporate_alert(
                     source.name,
                     serial,
@@ -189,15 +201,83 @@ class CRLMonitor:
                     cert.revocation_date,
                     cert.reason,
                 ),
-                company=True,
+
+                company=True
             )
 
             return
 
-        cn = self.resolver.resolve(serial)
+        # 2. Получаем информацию через API
 
-        logger.warning("New revoked certificate: %s", serial)
+        cert_info = self.resolver.resolve(serial)
+
+        cn = None
+
+        values = []
+
+        if cert_info:
+
+            cn = cert_info.common_name
+
+            if cert_info.common_name:
+
+                values.append(
+                    cert_info.common_name
+                )
+
+            values.extend(
+                cert_info.dns_names
+            )
+
+        # 3. Проверяем по фильтрам
+
+        company_match = None
+
+        if values:
+
+            company_match = self.company_filters.match(
+                values
+            )
+
+        if company_match:
+
+            logger.error(
+                "Corporate certificate detected by filter '%s': serial=%s values=%s",
+                company_match,
+                serial,
+                values
+            )
+
+            self.notifier.send(
+
+                corporate_alert(
+                    source.name,
+                    serial,
+                    cn or company_match,
+                    cert.revocation_date,
+                    cert.reason,
+                ),
+
+                company=True
+            )
+
+            return
+
+        # 4. Обычный warning
+
+        logger.warning(
+            "New revoked certificate: serial=%s CN=%s",
+            serial,
+            cn
+        )
 
         self.notifier.send(
-            warning(source.name, serial, cert.revocation_date, cert.reason, cn)
+
+            warning(
+                source.name,
+                serial,
+                cert.revocation_date,
+                cert.reason,
+                cn
+            )
         )

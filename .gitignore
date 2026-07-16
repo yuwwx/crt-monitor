@@ -2,6 +2,7 @@ __pycache__
 .venv
 config.yaml
 company_certs.yaml
+company_filters.yaml
 misc/company-certs-list.*
 logs
 state.json

@@ -7,6 +7,8 @@ from config import load_config
 
 from company import load_company_certificates
 
+from company_filters import load_company_filters
+
 from state import StateManager
 
 
@@ -41,13 +43,16 @@ def main():
 
     company_certs = load_company_certificates()
 
+    company_filters = load_company_filters()
+
     resolver = CertificateResolver(config.resolver)
 
     notifier = TelegramNotifier(config.telegram)
 
     notifier.send("Script started!")
 
-    monitor = CRLMonitor(config, state, company_certs, resolver, notifier)
+    monitor = CRLMonitor(config, state, company_certs,
+                         company_filters, resolver, notifier)
 
     # signal.signal(signal.SIGINT, shutdown_handler)
 

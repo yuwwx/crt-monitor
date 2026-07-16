@@ -17,6 +17,7 @@ def load_company_certificates(path: str = "company_certs.yaml"):
 
         serial = normalize_serial(item["serial"])
 
-        result[serial] = CompanyCertificate(serial=serial, domain=item["domain"])
+        result[serial] = CompanyCertificate(
+            serial=serial, domain=item["domain"])
 
     return result
