@@ -168,6 +168,8 @@ class CRLMonitor:
 
             state.processed.add(serial)
 
+            self.state.save()
+
         logger.info(
             "CRL %s processing completed: total=%s, new=%s, old_skipped=%s, already_processed=%s",
             source.name,
