@@ -274,7 +274,7 @@ class CRLMonitor:
             return
 
         # 4. Обычный warning
-        if self.config.notify_only_company_certificates:
+        if self.config.telegram.notify_only_company_certificates:
 
             logger.info(
 
