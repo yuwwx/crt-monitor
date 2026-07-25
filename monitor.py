@@ -274,20 +274,40 @@ class CRLMonitor:
             return
 
         # 4. Обычный warning
+        if self.config.notify_only_company_certificates:
+
+            logger.info(
+
+                "Skipping notification for non-corporate certificate: serial=%s",
+
+                serial,
+
+            )
+
+            return
 
         logger.warning(
+
             "New revoked certificate: serial=%s CN=%s",
+
             serial,
+
             cn
+
         )
 
         self.notifier.send(
 
             warning(
+
                 source.name,
+
                 serial,
+
                 cert.revocation_date,
+
                 cert.reason,
-                cn
-            )
+
+                cn)
         )
+        
