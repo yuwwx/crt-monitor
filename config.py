@@ -41,6 +41,7 @@ def load_config(path: str = "config.yaml") -> Config:
             token=data["telegram"]["token"],
             chat_id=str(data["telegram"]["chat_id"]),
             company_chat_id=data["telegram"].get("company_chat_id"),
+            send_all_to_company_chat_only=data["telegram"].get("send_all_to_company_chat_only", False),
         ),
         logging=LoggingConfig(level=data["logging"]["level"]),
         sources=[
@@ -63,3 +64,6 @@ def validate(config: Config):
 
     if not config.telegram.chat_id:
         raise ValueError("Telegram chat id is empty")
+
+    if config.telegram.send_all_to_company_chat_only and not config.telegram.company_chat_id:
+        raise ValueError("send_all_to_company_chat_only is True but company_chat_id is not set")
