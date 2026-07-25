@@ -35,6 +35,7 @@ def load_config(path: str = "config.yaml") -> Config:
             url=data["resolver"]["url"],
             timeout=data["resolver"]["timeout"],
             request_interval=data["resolver"]["request_interval"],
+            enabled=data["resolver"].get("enabled", True),
         ),
         telegram=TelegramConfig(
             token=data["telegram"]["token"],
