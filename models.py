@@ -19,6 +19,7 @@ class ResolverConfig:
     url: str
     timeout: int
     request_interval: float
+    enabled: bool = True
 
 
 @dataclass
