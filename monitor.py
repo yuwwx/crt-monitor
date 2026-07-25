@@ -209,9 +209,17 @@ class CRLMonitor:
 
             return
 
-        # 2. Получаем информацию через API
+        # 2. Получаем информацию через API (если резолвер включен)
 
-        cert_info = self.resolver.resolve(serial)
+        cert_info = None
+        
+        if self.config.resolver.enabled:
+        
+            cert_info = self.resolver.resolve(serial)
+        
+        else:
+        
+            logger.debug("Resolver is disabled, skipping certificate resolution for %s", serial)
 
         cn = None
 
