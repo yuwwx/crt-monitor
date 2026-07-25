@@ -27,7 +27,7 @@ class TelegramConfig:
     token: str
     chat_id: str
     company_chat_id: str | None = None
-    send_all_to_company_chat_only: bool = False
+    notify_only_company_certificates: bool = False
 
 
 @dataclass
