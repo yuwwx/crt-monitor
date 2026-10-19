@@ -16,6 +16,7 @@ from api.resolver import CertificateResolver
 
 from notify.telegram import TelegramNotifier
 
+from notify.bot import TelegramBot
 
 from monitor import CRLMonitor
 
@@ -54,6 +55,10 @@ def main():
     monitor = CRLMonitor(config, state, company_certs,
                          company_filters, resolver, notifier)
 
+    bot = TelegramBot(config, company_certs, company_filters)
+
+    bot.start()
+
     # signal.signal(signal.SIGINT, shutdown_handler)
 
     # signal.signal(signal.SIGTERM, shutdown_handler)
@@ -75,6 +80,8 @@ def main():
             notifier.send(f"🚨 Monitor error\n\n{e}")
 
         time.sleep(config.monitor.tick_interval)
+
+    bot.stop()
 
     state.save()
 

@@ -19,11 +19,13 @@ resolver:
   url: "https://ct.certkit.io/certificate/serial"
   timeout: 10
   request_interval: 20
+  enabled: true
 
 telegram:
   token: ""
   chat_id: ""
   company_chat_id: ""
+  notify_only_company_certificates: false
 
 logging:
   level: INFO
