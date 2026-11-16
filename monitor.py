@@ -213,13 +213,17 @@ class CRLMonitor:
 
         cert_info = None
         
-        if self.config.resolver.enabled:
+        if self.config.resolver.enabled and source.resolve:
         
             cert_info = self.resolver.resolve(serial)
         
         else:
         
-            logger.debug("Resolver is disabled, skipping certificate resolution for %s", serial)
+            logger.debug(
+                "Resolver is disabled for source %s, skipping certificate resolution for %s",
+                source.name,
+                serial,
+            )
 
         cn = None
 

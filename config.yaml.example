@@ -14,6 +14,9 @@ sources:
     url: "http://crl.harica.gr/HARICA-DV-TLS-Sub-R1.crl"
   - name: "HARICA DV TLS ECC"
     url: "http://crl.harica.gr/HARICA-DV-TLS-Sub-E1.crl"
+  - name: "Example without resolve"
+    url: "http://example.com/example.crl"
+    resolve: false
 
 resolver:
   url: "https://ct.certkit.io/certificate/serial"

@@ -12,6 +12,7 @@ class CRLConfig:
 class SourceConfig:
     name: str
     url: str
+    resolve: bool = True
 
 
 @dataclass

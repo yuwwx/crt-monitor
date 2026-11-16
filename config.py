@@ -45,7 +45,12 @@ def load_config(path: str = "config.yaml") -> Config:
         ),
         logging=LoggingConfig(level=data["logging"]["level"]),
         sources=[
-            SourceConfig(name=item["name"], url=item["url"]) for item in data["sources"]
+            SourceConfig(
+                name=item["name"],
+                url=item["url"],
+                resolve=item.get("resolve", True),
+            )
+            for item in data["sources"]
         ],
     )
 
