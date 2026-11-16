@@ -55,7 +55,7 @@ def main():
     monitor = CRLMonitor(config, state, company_certs,
                          company_filters, resolver, notifier)
 
-    bot = TelegramBot(config, company_certs, company_filters)
+    bot = TelegramBot(config, company_certs, company_filters, state=state)
 
     bot.start()
 
