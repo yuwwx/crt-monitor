@@ -49,6 +49,9 @@ def load_config(path: str = "config.yaml") -> Config:
                 name=item["name"],
                 url=item["url"],
                 resolve=item.get("resolve", True),
+                notify_only_company_certificates=item.get(
+                    "notify_only_company_certificates", False
+                ),
             )
             for item in data["sources"]
         ],

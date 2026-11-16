@@ -13,6 +13,7 @@ class SourceConfig:
     name: str
     url: str
     resolve: bool = True
+    notify_only_company_certificates: bool = False
 
 
 @dataclass

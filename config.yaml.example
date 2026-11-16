@@ -17,6 +17,9 @@ sources:
   - name: "Example without resolve"
     url: "http://example.com/example.crl"
     resolve: false
+  - name: "Example company-only"
+    url: "http://example.com/company-only.crl"
+    notify_only_company_certificates: true
 
 resolver:
   url: "https://ct.certkit.io/certificate/serial"
